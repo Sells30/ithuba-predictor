@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Ithuba Predictor — Web UI</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  </head>
+  <body>
+    <div class="container my-4">
+      <h1>Ithuba 5/36 Predictor — Web UI</h1>
+      <p class="text-muted">Upload a historical draws CSV or use the included sample_draws.csv, choose options and generate recommended lines.</p>
+
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+            <div class="alert alert-{{ category }}" role="alert">{{ message }}</div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+
+      <form method="post" action="{{ url_for('generate') }}" enctype="multipart/form-data" class="row g-3">
+        <div class="col-md-6">
+          <label for="file" class="form-label">Upload draws CSV (optional)</label>
+          <input class="form-control" type="file" name="file" id="file" accept=".csv">
+          <div class="form-text">If none provided, the bundled sample_draws.csv will be used.</div>
+        </div>
+
+        <div class="col-md-3">
+          <label for="method" class="form-label">Method</label>
+          <select id="method" name="method" class="form-select">
+            <option value="weighted" selected>weighted (recency)</option>
+            <option value="freq">freq (overall frequency)</option>
+            <option value="ml">ml (experimental)</option>
+          </select>
+        </div>
+
+        <div class="col-md-3">
+          <label for="lines" class="form-label">Lines to output</label>
+          <input type="number" class="form-control" id="lines" name="lines" value="{{ defaults.lines }}" min="1" max="100">
+        </div>
+
+        <div class="col-md-3">
+          <label for="candidates" class="form-label">Candidates to sample</label>
+          <input type="number" class="form-control" id="candidates" name="candidates" value="{{ defaults.candidates }}">
+        </div>
+
+        <div class="col-md-3">
+          <label for="decay" class="form-label">Decay (weighted)</label>
+          <input type="text" class="form-control" id="decay" name="decay" value="{{ defaults.decay }}">
+        </div>
+
+        <div class="col-md-3">
+          <label for="pair_weight" class="form-label">Pair weight</label>
+          <input type="text" class="form-control" id="pair_weight" name="pair_weight" value="{{ defaults.pair_weight }}">
+        </div>
+
+        <div class="col-md-3">
+          <label for="window" class="form-label">Window (last N draws, optional)</label>
+          <input type="text" class="form-control" id="window" name="window" value="{{ defaults.window }}">
+        </div>
+
+        <div class="col-12">
+          <button type="submit" class="btn btn-primary">Generate recommendations</button>
+          <a href="{{ url_for('scrape_page') }}" class="btn btn-outline-secondary ms-2">Run Scraper</a>
+          <a href="{{ url_for('predict_next_form') }}" class="btn btn-outline-success ms-2">Predict Next Draw</a>
+        </div>
+      </form>
+
+      <hr/>
+      <h6>Notes</h6>
+      <ul>
+        <li>The ML option requires scikit-learn and enough historical draws; otherwise it will fail.</li>
+        <li>Recommendations are generated server-side and a CSV will be available for download.</li>
+        <li>This UI runs locally; do not expose it publicly without appropriate security.</li>
+      </ul>
+    </div>
+  </body>
+</html>
