@@ -1,0 +1,4 @@
+Flask>=2.0
+requests>=2.25
+beautifulsoup4>=4.9
+lxml>=4.6
